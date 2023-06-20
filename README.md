@@ -36,13 +36,6 @@ article_info <- data.frame(
 
 print(article_info)
 ```
-### Step 6: Fetch the sequences associated with the articles
-```
-# Fetch the sequences using the article IDs
-sequences <- entrez_fetch(db, id = id_list, rettype = "fasta", retmode = "text")
-
-print(sequences)
-```
 ## Example
 ```
 # Install and load the required packages
@@ -74,11 +67,3 @@ article_info <- data.frame(
 
 # Display the extracted information
 print(article_info)
-
-# Fetch the sequences using the article IDs
-sequences <- entrez_fetch(db, id = id_list, rettype = "fasta", retmode = "text")
-
-# Display the fetched sequences
-cat("\nFetched sequences:\n")
-cat(sequences)
-```
