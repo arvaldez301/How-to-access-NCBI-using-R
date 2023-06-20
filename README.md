@@ -4,9 +4,12 @@ This tutorial will walk you through how to use R code to access NCBI and Pubmed
 ### Step 1: Install and load the required packages
 ```
 install.packages("rentrez")
+install.packages("dplyr")
+
 library(rentrez)
+library(dplyr)
 ```
-You may need other packages like ```XML``` or ```httr``` for processing the retrieved data. Install them if necessary using ```install.packages()```
+
 ### Step 2: Retrive PubMed IDs (PMIDs)
 To access PubMed articles, you typically start by retrieving a list of PubMed IDs (PMIDs) based on your search criteria. Here's an example of how to retrieve PMIDs using the ```entrez_search()``` function:
 ```
@@ -23,39 +26,59 @@ Once you have the PMIDs, you can fetch the article summaries using the ```entrez
 article_summaries <- entrez_summary(db = "pubmed", id = pmids)
 ```
 This retrieves the summaries for the articles corresponding to the given PMIDs
-### Step 4: Access full article data
-If you want to access the full article data, you can use the ```entrez_fetch()``` function. Here's an example:
+### Step 4: Extract the desired information from the article summaries
 ```
-# Fetch full article data for the first PMID
-article_data <- entrez_fetch(db = "pubmed", id = pmids[1], rettype = "xml")
+article_info <- data.frame(
+  Title = sapply(article_summaries, function(x) x$Title),
+  Journal = sapply(article_summaries, function(x) x$Source),
+  Year = sapply(article_summaries, function(x) substr(x$PubDate, start = 1, stop = 4))
+)
+
+print(article_info)
 ```
-The ```rettype``` parameter specifies the format of the retrieved data (e.g., XML, text).
-### Step 5: Process the retrieved data
-Once you have retrieved the data, you can process it as per your requirements. You may need to use XML parsing techniques or other methods depending on the data format you retrieved.
+### Step 6: Fetch the sequences associated with the articles
+```
+# Fetch the sequences using the article IDs
+sequences <- entrez_fetch(db, id = id_list, rettype = "fasta", retmode = "text")
+
+print(sequences)
+```
 ## Example
 ```
-# Step 1: Install required packages
+# Install and load the required packages
 install.packages("rentrez")
-install.packages("httr")  # Additional package for processing the retrieved data
+install.packages("dplyr")
 
-# Step 2: Load required packages
 library(rentrez)
-library(httr)
+library(dplyr)
 
-# Step 3: Retrieve PubMed IDs (PMIDs)
-search_query <- "cancer gene"  # Replace with your desired search terms
-search_results <- entrez_search(db = "pubmed", term = search_query, retmax = 10)
-pmids <- search_results$ids
+# Set the query term and database to search
+query <- "BRCA1"
+db <- "pubmed"
 
-# Step 4: Fetch Article Summaries
-article_summaries <- entrez_summary(db = "pubmed", id = pmids)
+# Perform the search
+search_results <- entrez_search(db, term = query)
 
-# Step 5: Access Full Article Data
-article_data <- entrez_fetch(db = "pubmed", id = pmids[1], rettype = "xml")
+# Extract the IDs from the search results
+id_list <- search_results$ids
 
-# Step 6: Process the Retrieved Data
-# For example, let's print the titles of the retrieved articles
-for (summary in article_summaries) {
-  print(summary$title)
-}
+# Fetch the article summaries using the IDs
+article_summaries <- entrez_summary(db, id = id_list)
+
+# Extract the desired information from the article summaries
+article_info <- data.frame(
+  Title = sapply(article_summaries, function(x) x$Title),
+  Journal = sapply(article_summaries, function(x) x$Source),
+  Year = sapply(article_summaries, function(x) substr(x$PubDate, start = 1, stop = 4))
+)
+
+# Display the extracted information
+print(article_info)
+
+# Fetch the sequences using the article IDs
+sequences <- entrez_fetch(db, id = id_list, rettype = "fasta", retmode = "text")
+
+# Display the fetched sequences
+cat("\nFetched sequences:\n")
+cat(sequences)
 ```
