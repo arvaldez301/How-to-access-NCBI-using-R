@@ -5,7 +5,7 @@ This tutorial will walk you through how to use R code to access NCBI and Pubmed
 The following packages each have a specific function:
   ```rentrez``` is used to access the NCBI Entrez API for retrieving PubMed data.
   ```dplyr``` is used for data manipulation tasks.
-  ```zml2``` is used to work with XML data.
+  ```xml2``` is used to work with XML data.
 ```
 install.packages("rentrez")
 install.packages("dplyr")
