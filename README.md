@@ -14,8 +14,9 @@ To access PubMed articles, you typically start by retrieving a list of PubMed ID
 search_query <- "your search query"
 search_results <- entrez_search(db = "pubmed", term = search_query, retmax = 10)
 pmids <- search_results$ids
+print(pmids)
 ```
-Replace "your search query" with your desired search terms, and retmax determines the maximum number of results to retrieve (in this case, 10).
+Replace "your search query" with your desired search terms, and retmax determines the maximum number of results to retrieve (in this case, 10). Print your results to view the PubMed IDs that were generated
 ### Step 3: Fetch Article Summaries
 Once you have the PMIDs, you can fetch the article summaries using the ```entrez_summary()``` function. Here's an example:
 ```
