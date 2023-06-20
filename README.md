@@ -23,33 +23,46 @@ To access PubMed articles, you typically start by retrieving a list of PubMed ID
 search_query <- "your search query"
 
 #Perform the search
-search_results <- entrez_search(db = "pubmed", term = search_query, retmax = 10)
+search_results <- entrez_search(db = "pubmed", term = search_query, retmax = 5)
 
 #Extract the IDs
 pmids <- search_results$ids
 print(pmids)
 ```
 Replace "your search query" with your desired search terms, and retmax determines the maximum number of results to retrieve (in this case, 10). Print your results to view the PubMed IDs that were generated.
-
 ### Step 3: Fetch the MEDLINE records using IDs
+Once you have the PMIDs, you can fetch the recordss using the entrez_fetch() function. Here's an example:
 ```
 medline_records <- entrez_fetch(db, id = id_list, rettype = "medline", retmode = "xml")
 ```
-
 ### Step 4: Parse the XML data using 'xml2::read_xml'
 ```
 parsed_records <- xml2::read_xml(medline_records)
 ```
-## Extract the desired information from the parsed records
+### Step 5: Extract the titles, journals, and years from the parsed records
+```
+titles <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//ArticleTitle"))
+journals <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//ISOAbbreviation"))
+years <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//PubDate/Year"))
+```
+### Step 6: Extract the abstracts from the parsed records
+```
+abstracts <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//AbstractText"))
+```
+### Step 7: Determine the Number of titles
+This function will tell you how many titles were retrieved. This is good if you did not initally set the retmax() for a specific number.
+```
+num_titles <- length(titles)
+```
+### Step 8: Create the Article Info Data frame and display the results
 ```
 article_info <- data.frame(
-  Title = xml2::xml_text(xml2::xml_find_all(parsed_records, "//ArticleTitle")),
-  Journal = xml2::xml_text(xml2::xml_find_all(parsed_records, "//ISOAbbreviation")),
-  Year = xml2::xml_text(xml2::xml_find_all(parsed_records, "//PubDate/Year"))
-  Abstract = xml2::xml_text(xml2::xml_find_all(parsed_records, "//AbstractText"))
+  Title = titles,
+  Journal = journals,
+  Year = years,
+  Abstract = abstracts
 )
 
-#Display the information
 print(article_info)
 ```
 ## Further Notes
