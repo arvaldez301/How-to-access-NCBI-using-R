@@ -31,7 +31,7 @@ print(pmids)
 ```
 Replace "your search query" with your desired search terms, and retmax determines the maximum number of results to retrieve (in this case, 10). Print your results to view the PubMed IDs that were generated.
 ### Step 3: Fetch the MEDLINE records using IDs
-Once you have the PMIDs, you can fetch the recordss using the entrez_fetch() function. Here's an example:
+Once you have the PMIDs, you can fetch the records using the entrez_fetch() function. Here's an example:
 ```
 medline_records <- entrez_fetch(db, id = id_list, rettype = "medline", retmode = "xml")
 ```
@@ -49,10 +49,13 @@ years <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//PubDate/Year"))
 ```
 abstracts <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//AbstractText"))
 ```
-### Step 7: Determine the Number of titles
+### Step 7: Determine the Number of titles and subset the abstracts
 This function will tell you how many titles were retrieved. This is good if you did not initally set the retmax() for a specific number.
 ```
 num_titles <- length(titles)
+
+# Subset the abstracts to match the number of titles
+abstracts <- abstracts[1:num_titles]
 ```
 ### Step 8: Create the Article Info Data frame and display the results
 ```
@@ -64,6 +67,44 @@ article_info <- data.frame(
 )
 
 print(article_info)
+```
+
+## More Data Exploration
+### To count the occurrences of specific words
+```
+keyword1 <- "treatment"
+keyword2 <- "diagnosis"
+
+count_keyword1 <- sum(grepl(keyword1, abstracts, ignore.case = TRUE))
+count_keyword2 <- sum(grepl(keyword2, abstracts, ignore.case = TRUE))
+
+print(paste("Occurrences of", keyword1, "in abstracts:", count_keyword1))
+print(paste("Occurrences of", keyword2, "in abstracts:", count_keyword2))
+```
+### Find the article with the longest title and print its details
+The nchar function is used to calculate the number of characters in a string. By adding which.max, this will look for the longest titles only
+```
+longest_title_index <- which.max(nchar(titles))
+longest_title <- titles[longest_title_index]
+longest_title_authors <- authors[longest_title_index]
+longest_title_year <- years[longest_title_index]
+longest_title_abstract <- abstracts[longest_title_index]
+
+print("Article with the longest title:")
+print(paste("Title:", longest_title))
+print(paste("Authors:", longest_title_authors))
+print(paste("Year:", longest_title_year))
+print(paste("Abstract:", longest_title_abstract))
+```
+### Determine the publication year with the highest number of articles and print the count:
+```
+year_counts <- table(years)
+highest_year <- names(year_counts)[which.max(year_counts)]
+highest_year_count <- max(year_counts)
+
+print("Publication year with the highest number of articles:")
+print(paste("Year:", highest_year))
+print(paste("Count:", highest_year_count))
 ```
 ## Further Notes
 XML data stands for eXtensible Markup Language much like HTML. It is designed to store and transport data.
