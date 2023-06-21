@@ -42,7 +42,8 @@ parsed_records <- xml2::read_xml(medline_records)
 ### Step 5: Extract the titles, journals, and years from the parsed records
 ```
 titles <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//ArticleTitle"))
-journals <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//ISOAbbreviation"))
+journals <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//Journal"))
+authors <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//Author"))
 years <- xml2::xml_text(xml2::xml_find_all(parsed_records, "//PubDate/Year"))
 ```
 ### Step 6: Extract the abstracts from the parsed records
@@ -72,8 +73,8 @@ print(article_info)
 ## More Data Exploration
 ### To count the occurrences of specific words
 ```
-keyword1 <- "treatment"
-keyword2 <- "diagnosis"
+keyword1 <- "Your Keyword Here"
+keyword2 <- "Your Keyword Here"
 
 count_keyword1 <- sum(grepl(keyword1, abstracts, ignore.case = TRUE))
 count_keyword2 <- sum(grepl(keyword2, abstracts, ignore.case = TRUE))
